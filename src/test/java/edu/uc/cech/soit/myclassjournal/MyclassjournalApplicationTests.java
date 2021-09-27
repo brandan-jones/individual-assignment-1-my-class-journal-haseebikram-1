@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,4 +66,63 @@ class MyclassjournalApplicationTests {
 
     }
 
+    /**
+     * Validates that JournalService can return an Arraylist of JournalEntries with the given date
+     */
+
+    @Test
+    void verifyThatJournalServicesFetchByDateWorksCorrectly(){
+        String notes1 =  "My first entry!";
+        String date1 = "October 2021";
+
+        String notes2 = "My second entry!";
+        String date2 = "October 2021";
+
+        String notes3 = "My third entry!";
+        String date3 = "November 2021";
+
+        JournalEntry journalEntry1 = new JournalEntry();
+        journalEntry1.setNotes(notes1);
+        journalEntry1.setDate(date1);
+
+        JournalEntry journalEntry2 = new JournalEntry();
+        journalEntry2.setNotes(notes2);
+        journalEntry2.setDate(date2);
+
+        JournalEntry journalEntry3 = new JournalEntry();
+        journalEntry3.setNotes(notes3);
+        journalEntry3.setDate(date3);
+
+        List<JournalEntry> octoberEntries = new ArrayList<JournalEntry>();
+        octoberEntries.add(journalEntry1);
+        octoberEntries.add(journalEntry2);
+
+        journalService.save(journalEntry1);
+        journalService.save(journalEntry2);
+        journalService.save(journalEntry3);
+
+        List<JournalEntry> returnedList = journalService.fetchByDate("October 2021");
+
+        boolean listsAreEqual = true;
+        if(returnedList.size() != octoberEntries.size()){
+            assertTrue(!listsAreEqual);
+        }else {
+            for (JournalEntry je :
+                    returnedList) {
+                boolean foundMatch = false;
+                for (JournalEntry oe :
+                        octoberEntries) {
+                    if (je.getDate().equals(oe.getDate()) && je.getNotes().equals(oe.getNotes())){
+                        foundMatch = true;
+                        break;
+                    }
+                }
+                if (!foundMatch){
+                    listsAreEqual = false;
+                    break;
+                }
+            }
+        }
+        assertTrue(listsAreEqual);
+    }
 }
